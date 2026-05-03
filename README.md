@@ -30,6 +30,17 @@ A Claude skill that performs **Feature Archaeology** — trace any product featu
 
 ---
 
+## 🚀 Key Features
+
+- **Multi-Signal Search** — Traces features across keywords, routes, dependencies, and logic using 6 search passes.
+- **Visual Highlight Injection** — Injects non-destructive, high-visibility box-art comments into your source files.
+- **Interactive CLI** — Prints `filepath:line` formatted output so you can **Cmd/Ctrl + Click** to jump straight to the code.
+- **Automatic Emoji Mapping** — Smartly detects roles and layers to add context-aware icons (💾, 🧠, 🎼, 🤖).
+- **Idempotent Workflow** — Safely run traces or cleanups multiple times; the tool automatically manages old markers.
+- **Zero Code modification** — Only comments are added or removed; your application logic remains 100% original.
+
+---
+
 ## 💬 Example Prompts
 
 ```
