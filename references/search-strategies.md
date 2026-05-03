@@ -1,5 +1,12 @@
 #
 # ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Feature Tracing                            ║
+# ║  Role: 🔹 strategy                                            ║
+# ║  Layer: 📚 references  │  Part 2 of 5                         ║
+# ╚════════════════════════════════════════════════════════════╝
+#
+#
+# ╔════════════════════════════════════════════════════════════╗
 # ║  ⚡ FEATURE-TRACE: Project Core                               ║
 # ║  Role: 🔹 Strategies                                          ║
 # ║  Layer: 📚 References  │  Part 4 of 4                         ║
@@ -98,6 +105,7 @@ grep -rn --include="*.py" \
 
 # Django admin
 grep -rn --include="*.py" \
+# └─ END FEATURE-TRACE: Feature Tracing ──────────────────────
   -i "FEATURE_TERM" \
   */admin.py
 ```

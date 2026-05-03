@@ -1,7 +1,11 @@
 # 🔍 PLUTO — Product-Level Universal Trace & Orchestrator
 
+> [!TIP]
+> **Token Efficient**: PLUTO uses a "Grep-First" strategy and local script execution to minimize context window usage.
+
 > **"Pluto, trace the checkout flow."**  
 > → Finds every file, explains the logic, and **highlights the code in your editor.**
+
 
 ---
 

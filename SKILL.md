@@ -1,3 +1,14 @@
+# 
+# ─────────────────────────────────────────────────────────────
+# [User Request] ──► [SKILL.md] ──► [Search Strategy]
+#        ▲                                 │
+#        │                                 ▼
+# [Cleanup Logic] ◄── [Editor Highlights] ◄── [Injection Logic]
+#                                          │
+#                                          ▼
+#                                  [Mission Dashboard]
+# ─────────────────────────────────────────────────────────────
+# 
 ---
 name: feature-tracer
 description: >
@@ -6,6 +17,20 @@ description: >
   whenever the user asks: "show me the code for X", "which files handle Y", "where is Z
   implemented", "trace the auth flow", "find everything related to payments", "what code runs
   when I click Submit", "show me the signup feature end to end", or any question framed around
+
+  ### 📉 Token-Efficiency Rules
+  - **Grep First**: Never read a whole file "blindly." Use `grep_search` to find line numbers first.
+  - **Surgical View**: Use `view_file` with specific `StartLine` and `EndLine` to read only the code you need.
+  - **Script Offloading**: Always use `scripts/inject_highlights.py` for modifications; never rewrite entire files manually in the chat.
+  - **Concise Reporting**: Keep the Trace Report descriptions punchy and technical.
+
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Feature Tracing                            ║
+# ║  Role: 🎼 orchestration                                       ║
+# ║  Layer: 🤖 ai skill  │  Part 1 of 5                           ║
+# ╚════════════════════════════════════════════════════════════╝
+#
   understanding WHERE and HOW a feature is implemented across multiple files.
   After tracing, this skill can inject bright visual highlight comments into the actual source
   files so the user can navigate to any file and instantly see the relevant lines — then clean
@@ -91,7 +116,9 @@ Categorize every file into one of these layers:
 
 ## Phase 3 — Build the Trace Report
 
-Generate a premium, visual report in the chatbox using the **Double-Box** style.
+Generate a premium, visual report in the chatbox using the **Double-Box** style. 
+**CRITICAL**: Always include precise line ranges (e.g., `path/to/file:start-end`) for every file listed.
+
 
 ---
 
@@ -111,6 +138,7 @@ python3 scripts/inject_highlights.py \
 ---
 
 ## Phase 5 — Cleanup
+# └─ END FEATURE-TRACE: Feature Tracing ──────────────────────
 
 When the user says "remove highlights", run:
 \`\`\`bash

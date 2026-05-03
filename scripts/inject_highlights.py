@@ -39,6 +39,13 @@
 #     │  💾 PERSISTENCE ◄─────────┤  🗺️ MAP BUILDER   │
 #     └────────────────┘          └───────────────────┘
 # ─────────────────────────────────────────────────────────────
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Feature Tracing                            ║
+# ║  Role: 🧠 logic                                               ║
+# ║  Layer: 📜 scripts  │  Part 3 of 5                            ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 """
 inject_highlights.py
 ────────────────────
@@ -148,6 +155,7 @@ LAYER_EMOJIS = {
     "references":    "📚",
     "general":       "📦",
 }
+# └─ END FEATURE-TRACE: Feature Tracing ──────────────────────
 
 
 def get_emoji(text: str, mapping: dict, default: str = "🔹") -> str:

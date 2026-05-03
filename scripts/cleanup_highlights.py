@@ -2,6 +2,13 @@
 # ─────────────────────────────────────────────────────────────
 # 🚦 CLI ──► 🧠 Logic ──► 🗑️ Cleanup
 # ─────────────────────────────────────────────────────────────
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Feature Tracing                            ║
+# ║  Role: 🧠 logic                                               ║
+# ║  Layer: 📜 scripts  │  Part 4 of 5                            ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 """
 cleanup_highlights.py
 ─────────────────────
@@ -98,6 +105,7 @@ def load_manifest(manifest_path: str) -> dict:
                 return {"features": {}}
             except json.JSONDecodeError:
                 return {"features": {}}
+# └─ END FEATURE-TRACE: Feature Tracing ──────────────────────
     return {"features": {}}
 
 
