@@ -86,9 +86,16 @@ def clean_file(filepath: str, dry_run: bool = False) -> int:
     with open(filepath, "w", encoding="utf-8") as f:
         f.writelines(cleaned_lines)
 
-    print(f"🧹 Cleaned {removed_count} line(s) from: {filepath}")
+    print(f"🧹 Cleaned {removed_count} line(s) from: {filepath}:1")
     return removed_count
 
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Project Core                               ║
+# ║  Role: 💾 Persistence                                         ║
+# ║  Layer: 📜 Scripts  │  Part 2 of 4                            ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 
 def load_manifest(manifest_path: str) -> dict | None:
     """Load manifest JSON. Returns None if the file does not exist."""
@@ -104,7 +111,8 @@ def delete_manifest(manifest_path: str, dry_run: bool = False) -> None:
         print(f"[DRY RUN] Would delete manifest: {manifest_path}")
         return
     os.remove(manifest_path)
-    print(f"🗑️  Deleted manifest: {manifest_path}")
+    print(f"🗑️  Deleted manifest: {manifest_path}:1")
+# └─ END FEATURE-TRACE: Project Core ─────────────────────────
 
 
 def collect_source_files(root: str = ".") -> list[str]:
@@ -149,13 +157,6 @@ def main():
 
     args       = parser.parse_args()
     manifest   = load_manifest(args.manifest)
-#
-# ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
-# ║  Role: 🛠️ Workflow                                           ║
-# ║  Layer: 🧠 Core  │  Part 4 of 4                               ║
-# ╚════════════════════════════════════════════════════════════╝
-#
 
     # ── Mode 1: Use manifest (fast, targeted) ────────────────
     if manifest and not args.force:
@@ -188,7 +189,6 @@ def main():
             print(f"   Lines removed:    {total_removed}")
         else:
             print(f"\n[DRY RUN] Would remove ~{total_removed} line(s) from {cleaned_count} file(s)")
-# └─ END FEATURE-TRACE: Manifest Tracking ────────────────────
 
     # ── Mode 2: No manifest — scan everything (--force) ──────
     elif args.force or manifest is None:

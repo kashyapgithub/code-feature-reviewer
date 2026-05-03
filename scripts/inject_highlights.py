@@ -237,6 +237,13 @@ def inject_into_file(
     start_idx = max(0, min(start_line - 1, total_original))  # 0-based index
     end_idx   = max(start_idx, min(end_line - 1, total_original - 1))
 
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Project Core                               ║
+# ║  Role: 💾 Persistence                                         ║
+# ║  Layer: 📜 Scripts  │  Part 1 of 4                            ║
+# ╚════════════════════════════════════════════════════════════╝
+#
     # Build header and footer comment lines
     header_lines = build_highlight_header(
         feature, role, part_index, part_total, layer, prefix
@@ -258,6 +265,7 @@ def inject_into_file(
 
     if dry_run:
         print(f"\n[DRY RUN] Would inject into: {filepath}")
+# └─ END FEATURE-TRACE: Project Core ─────────────────────────
         print(f"  Header at line {start_line}, footer after line {end_line}")
         for line in header_lines:
             print(f"  {line}")
@@ -274,7 +282,7 @@ def inject_into_file(
         + [start_idx + 1 + len(header_lines) + (end_idx - start_idx) + 1]  # footer line
     )
 
-    print(f"✅ Injected highlights into: {filepath} (lines {start_line}–{end_line})")
+    print(f"✅ Injected highlights into: {filepath}:{start_line}")
     return injected_line_numbers
 
 
@@ -290,7 +298,7 @@ def save_manifest(manifest_path: str, manifest: dict) -> None:
     """Persist manifest to disk."""
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
-    print(f"📋 Manifest saved: {manifest_path}")
+    print(f"📋 Manifest saved: {manifest_path}:1")
 
 
 def parse_file_arg(file_arg: str) -> tuple[str, int, int]:
@@ -353,13 +361,6 @@ def main():
     manifest["feature"]   = feature
     manifest["timestamp"] = datetime.now(timezone.utc).isoformat()
     if "files" not in manifest:
-#
-# ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
-# ║  Role: 🛠️ Workflow                                           ║
-# ║  Layer: 🧠 Core  │  Part 3 of 4                               ║
-# ╚════════════════════════════════════════════════════════════╝
-#
         manifest["files"] = []
 
     print(f"\n🔍 Injecting highlights for feature: '{feature}'")
@@ -381,7 +382,6 @@ def main():
                 role, file_arg = parts
                 layer = "General"
 
-# └─ END FEATURE-TRACE: Manifest Tracking ────────────────────
         filepath, start_line, end_line = parse_file_arg(file_arg)
 
         if not os.path.exists(filepath):

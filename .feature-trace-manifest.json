@@ -1,31 +1,57 @@
 {
-  "feature": "Manifest Tracking",
-  "timestamp": "2026-05-03T11:36:22.866274+00:00",
+  "feature": "Project Core",
+  "timestamp": "2026-05-03T11:41:01.370654+00:00",
   "files": [
     {
       "path": "scripts/inject_highlights.py",
       "injected_lines": [
-        350,
-        351,
-        352,
-        353,
-        354,
-        355,
-        356,
-        378
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        268
       ]
     },
     {
       "path": "scripts/cleanup_highlights.py",
       "injected_lines": [
-        152,
-        153,
-        154,
-        155,
-        156,
-        157,
-        158,
-        191
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        115
+      ]
+    },
+    {
+      "path": "SKILL.md",
+      "injected_lines": [
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        140
+      ]
+    },
+    {
+      "path": "references/search-strategies.md",
+      "injected_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        108
       ]
     }
   ]

@@ -69,6 +69,13 @@ search patterns before proceeding.
 
 ---
 
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Project Core                               ║
+# ║  Role: 🎼 Orchestration                                       ║
+# ║  Layer: 🤖 AI Skill  │  Part 3 of 4                           ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 ## Phase 2 — Multi-Signal Search
 
 Run ALL of these search passes in parallel where possible. Every signal type can reveal
@@ -130,6 +137,7 @@ grep -rn \
   --exclude-dir={node_modules,.git} \
   . | head -20
 ```
+# └─ END FEATURE-TRACE: Project Core ─────────────────────────
 
 ---
 

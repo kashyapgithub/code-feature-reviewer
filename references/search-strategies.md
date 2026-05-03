@@ -1,3 +1,10 @@
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Project Core                               ║
+# ║  Role: 🔹 Strategies                                          ║
+# ║  Layer: 📚 References  │  Part 4 of 4                         ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 # Search Strategies by Tech Stack
 
 Reference this file when you've identified the tech stack in Phase 1.
@@ -98,6 +105,7 @@ grep -rn --include="*.py" \
 ---
 
 ## Python / FastAPI
+# └─ END FEATURE-TRACE: Project Core ─────────────────────────
 
 ```bash
 # FastAPI route decorators
