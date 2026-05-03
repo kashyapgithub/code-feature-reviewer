@@ -26,6 +26,7 @@ Each "filepath:start_line:end_line" entry tells the script:
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 
@@ -68,10 +69,12 @@ LANG_COMMENT_STYLES = {
     # Shell
     ".sh":    ("#",  "#",  "#",  "#"),
     ".bash":  ("#",  "#",  "#",  "#"),
+    # Markdown
+    ".md":    ("#",  "#",  "#",  "#"),
 }
 
-# Default fallback for unknown extensions
-DEFAULT_COMMENT = ("//", "//", "//", "//")
+# Default fallback for unknown extensions (using # as it is safe for many shell/config formats)
+DEFAULT_COMMENT = ("#", "#", "#", "#")
 
 # Width of the highlight box
 BOX_WIDTH = 62
@@ -97,11 +100,6 @@ def build_highlight_header(
     Returns a list of strings (each is one source line, no trailing newline).
 
     Example output (JS):
-        // ╔══════════════════════════════════════════════════════════╗
-        // ║  ⚡ FEATURE-TRACE: user authentication                   ║
-        // ║  Role: Validates JWT on every protected route            ║
-        // ║  Layer: Backend Middleware  │  Part 3 of 8               ║
-        // ╚══════════════════════════════════════════════════════════╝
     """
     inner_width = BOX_WIDTH - 4  # accounts for "// ║  " and "  ║"
 
@@ -137,7 +135,6 @@ def build_highlight_footer(feature: str, prefix: str) -> str:
     Build the small end-of-block marker line.
 
     Example:
-        // └─ END FEATURE-TRACE: user authentication ──────────────────
     """
     label = f"└─ END FEATURE-TRACE: {feature} "
     dashes = "─" * max(0, BOX_WIDTH - len(label) - 2)
@@ -299,13 +296,16 @@ def main():
         role  = ""
         layer = "Unknown Layer"
 
+        role = "Responsible Code"
+        layer = "General"
+
         if "|" in file_arg:
-            meta, file_arg = file_arg.split("|", 1)
-            meta_parts = meta.split("|")
-            if len(meta_parts) >= 1:
-                role = meta_parts[0]
-            if len(meta_parts) >= 2:
-                layer = meta_parts[1]
+            parts = file_arg.split("|")
+            if len(parts) == 3:
+                role, layer, file_arg = parts
+            elif len(parts) == 2:
+                role, file_arg = parts
+                layer = "General"
 
         filepath, start_line, end_line = parse_file_arg(file_arg)
 

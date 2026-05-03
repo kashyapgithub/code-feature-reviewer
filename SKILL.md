@@ -12,6 +12,8 @@ description: >
   them up on request. Works in Claude Code, Cursor, VS Code (via Claude/Copilot), and any
   AI tool with file system access. Trigger this skill aggressively — if the user says anything
   like "find the code for", "show me where", "trace the flow of", use it.
+  IMPORTANT: Always perform the Trace Report and the Highlight Injection in a single response
+  unless the user explicitly asks for "trace only".
 ---
 
 # Feature Tracer Skill
@@ -35,6 +37,7 @@ Parse the user's query for:
 
 If the feature name is ambiguous, **make a best guess and proceed** — don't ask for clarification.
 State your interpretation at the start: _"Tracing the feature: **user login flow**"_.
+**Always aim to highlight specific functions/blocks (e.g. 10-50 lines) rather than entire files.**
 
 ---
 
@@ -179,10 +182,6 @@ Found [N] files responsible for this feature.
   📄 ...
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 TIP: Say "highlight [feature name]" to inject bright
-   markers into these files so you can see the code
-   visually in your editor.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 Group files by architectural layer. Common layers:
@@ -191,26 +190,20 @@ Group files by architectural layer. Common layers:
 
 ---
 
-## Phase 5 — Highlight Mode (Optional)
+## Phase 5 — Instant Highlight Injection
 
-If the user asks to **highlight** the feature in their actual files, run the highlight injector.
+After outputting the Trace Report, **immediately** run the `scripts/inject_highlights.py` script
+to annotate the files. Use the `Role|Layer|filepath:start:end` format to ensure metadata is correct.
 
-### What a Highlight Looks Like
-
-This is what gets injected **above each relevant code block**:
-
-```javascript
-// ╔══════════════════════════════════════════════════════════╗
-// ║  ⚡ FEATURE-TRACE: user authentication                   ║
-// ║  Role: Validates JWT tokens on every protected request   ║
-// ║  Part 3 of 8 — Backend Middleware                        ║
-// ╚══════════════════════════════════════════════════════════╝
+Example command:
+```bash
+python scripts/inject_highlights.py \
+  --feature "feature name" \
+  --files "Role|Layer|path:start:end" "Another Role|Another Layer|path:start:end"
 ```
 
-And a smaller inline marker at the end of the block:
-```javascript
-// └─ END FEATURE-TRACE: user authentication ─────────────────
-```
+Then conclude your response with:
+_"✅ I have also injected bright highlight markers into these [N] files so you can see them in your editor."_
 
 ### Rules for Injecting Highlights
 

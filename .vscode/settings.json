@@ -1,0 +1,73 @@
+{
+  "better-comments.tags": [
+    {
+      "tag": "\u26a1",
+      "color": "#1a1a1a",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#FFB300",
+      "bold": true,
+      "italic": false
+    },
+    {
+      "tag": "\u2554",
+      "color": "#FFB300",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#3D2E00",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "\u255a",
+      "color": "#FFB300",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#3D2E00",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "\u2551",
+      "color": "#FFD54F",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#2A1F00",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "\u2514",
+      "color": "#FF8F00",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#1C1400",
+      "bold": false,
+      "italic": false
+    }
+  ],
+  "todo-tree.general.tags": [
+    "FEATURE-TRACE"
+  ],
+  "todo-tree.highlights.customHighlight": {
+    "FEATURE-TRACE": {
+      "icon": "zap",
+      "type": "line",
+      "foreground": "#1a1a1a",
+      "background": "#FFB300",
+      "iconColour": "#FFB300",
+      "fontWeight": "bold",
+      "borderRadius": "3px",
+      "gutterIcon": true
+    }
+  },
+  "todo-tree.highlights.defaultHighlight": {
+    "type": "line"
+  },
+  "editor.rulers": [
+    {
+      "column": 0,
+      "color": "#FFB30022"
+    }
+  ]
+}

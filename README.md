@@ -64,15 +64,9 @@ feature-tracer/
 When you say **"highlight the auth flow"**, Claude injects this **above** your code:
 
 ```ts
-// ╔══════════════════════════════════════════════════════════╗
-// ║  ⚡ FEATURE-TRACE: user authentication                   ║
-// ║  Role: Validates JWT token on every protected route      ║
-// ║  Layer: Backend Middleware  │  Part 3 of 8               ║
-// ╚══════════════════════════════════════════════════════════╝
 export function authMiddleware(req, res, next) {
   // ... your original code, completely untouched
 }
-// └─ END FEATURE-TRACE: user authentication ───────────────────
 ```
 
 - Every file is tagged with its part number (`Part 3 of 8`) so you see the full scope
@@ -215,6 +209,23 @@ Point your AI assistant's skill/context path to the `feature-tracer/` folder, or
 
 ### Claude.ai (web)
 Upload `SKILL.md` as a file at the start of your conversation. Trace reports work fully; file highlights require local script execution.
+
+## 🚀 Using in a New Project
+
+To use Feature Tracer in a different codebase, simply ensure your AI assistant has access to the `SKILL.md` file and the `scripts/` directory.
+
+### Method 1: Drop-in (Recommended)
+Copy the `feature-tracer/` folder into your new project. Tell your AI: *"Read SKILL.md and use it to trace features."*
+
+### Method 2: Global Rules (Cursor / VS Code)
+1. Copy the contents of `SKILL.md` into your project's `.cursorrules` or `.clauderules` file.
+2. Keep the `scripts/` folder in your project root so the AI can execute them.
+
+### Method 3: Claude Code CLI
+Copy the folder to your global skills directory:
+```bash
+cp -r feature-tracer ~/.claude/skills/
+```
 
 ---
 
