@@ -1,3 +1,23 @@
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: PLUTO Core Architecture                    ║
+# ║  Role: 📄 Docs                                                ║
+# ║  Layer: 🔹 Manual  │  Part 4 of 4                             ║
+# ╚════════════════════════════════════════════════════════════╝
+#
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Branding System                            ║
+# ║  Role: 🔹 References                                          ║
+# ║  Layer: 🔹 Docs  │  Part 2 of 3                               ║
+# ╚════════════════════════════════════════════════════════════╝
+#
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  Role: 🔹 References                                          ║
+# ║  Layer: 🔹 Docs  │  Part 2 of 3                               ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 # 🔍 PLUTO — Product-Level Universal Trace & Orchestrator
 
 > **"Pluto, trace the checkout flow."**  
@@ -14,6 +34,16 @@
 4. **RECOVERY**: One command to strip all markers, leaving your codebase 100% untouched and original.
 
 ---
+
+### 💡 Troubleshooting: Hidden Reports
+In some terminal environments (like **Claude Code**), long reports or trace results may be automatically collapsed to keep the UI tidy. 
+
+*   **To Unhide**: Look for a button that says `Worked for [X] min >` and **click it** to expand the full PLUTO report.
+*   **Mission Dashboard**: If the CLI keeps hiding your reports, open **`PLUTO_DASHBOARD.md`** in your editor. This file is automatically updated with every trace and will **never** be hidden!
+# └─ END FEATURE-TRACE: Branding System ──────────────────────
+
+---
+# └─ END FEATURE-TRACE: PLUTO Core Architecture ──────────────
 
 **PLUTO** is a Claude skill that performs **Feature Archaeology** — trace any product feature or operation across your entire codebase, then inject bright visual markers so you can navigate the code instantly.
 

@@ -1,4 +1,28 @@
+# 
+# ─────────────────────────────────────────────────────────────
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🚦 SKILL ID   ├─────────►│  📜 README DOCS  │
+#     └───────┬────────┘          └─────────┬─────────┘
+#             │                             │
+#             ▼                             ▼
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🧠 CLI OUTPUT ├─────────►│  🎨 BOX ART      │
+#     └────────────────┘          └───────────────────┘
+# ─────────────────────────────────────────────────────────────
+# 
+# 
+# ─────────────────────────────────────────────────────────────
+#     ┌────────────────┐          ┌───────────────────┐\n    │  🚦 SKILL ID   ├─────────►│  📜 README DOCS  │\n    └───────┬────────┘          └─────────┬─────────┘\n            │                             │\n            ▼                             ▼\n    ┌────────────────┐          ┌───────────────────┐\n    │  🧠 CLI OUTPUT ├─────────►│  🎨 BOX ART      │\n    └────────────────┘          └───────────────────┘
+# ─────────────────────────────────────────────────────────────
+# 
 ---
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Branding System                            ║
+# ║  Role: 🎼 Orchestration                                       ║
+# ║  Layer: 🔹 Identity  │  Part 1 of 3                           ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 name: feature-tracer
 description: >
   Traces any product feature or operation across an entire codebase — finding every file,
@@ -6,11 +30,18 @@ description: >
   whenever the user asks: "show me the code for X", "which files handle Y", "where is Z
   implemented", "trace the auth flow", "find everything related to payments", "what code runs
   when I click Submit", "show me the signup feature end to end", or any question framed around
+# └─ END FEATURE-TRACE: Branding System ──────────────────────
   understanding WHERE and HOW a feature is implemented across multiple files.
   After tracing, this skill can inject bright visual highlight comments into the actual source
   files so the user can navigate to any file and instantly see the relevant lines — then clean
   them up on request. Works in Claude Code, Cursor, VS Code (via Claude/Copilot), and any
   AI tool with file system access. Trigger this skill aggressively — if the user says anything
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  Role: 🎼 Orchestration                                       ║
+# ║  Layer: 🔹 Identity  │  Part 1 of 3                           ║
+# ╚════════════════════════════════════════════════════════════╝
+#
   like "find the code for", "show me where", "trace the flow of", use it.
   IMPORTANT: Always perform the Trace Report and the Highlight Injection in a single response
   unless the user explicitly asks for "trace only".
@@ -203,26 +234,37 @@ Group files by architectural layer. Common layers:
 → `Data Access / DB` → `Config / Schema` → `Tests`
 ### Phase 4 — Combined Trace Report & Flow Diagram
 
-Present the findings in a clear, layered report. **Crucially, include an ASCII flow diagram showing how the data/logic flows through the files.**
+Present the findings in a clear, layered report. **Crucially, include a premium ASCII flow diagram showing the architectural connections.**
 
-#### Format:
-1.  **Visual Flow Diagram**: A horizontal or vertical ASCII diagram (e.g., `[Route] ──► [Logic] ──► [DB]`).
+#### Improved Flow UI Template:
+```text
+    ┌────────────────┐          ┌───────────────────┐
+    │  🚦 ENTRY / UI ├─────────►│  🧠 LOGIC / SVC   │
+    └───────┬────────┘          └─────────┬─────────┘
+            │                             │
+            ▼                             ▼
+    ┌────────────────┐          ┌───────────────────┐
+    │  🔌 API / ROUTE├─────────►│  💾 DATA / PERSIST│
+    └────────────────┘          └───────────────────┘
+```
+1.  **Visual Flow Diagram**: Use the double-lined or single-lined box-drawing characters for a professional look.
 2.  **Layered File List**: Grouped by Role/Layer.
 3.  **Clickable Paths**: Ensure all file paths are formatted as `[filename](file:///path/to/file#Lstart-Lend)`.
 
 ---
 
-### Phase 5 — Auto-Injection
-Immediately after the report, run `inject_highlights.py` to apply markers.
+### Phase 5 — Auto-Injection & Feature Map
+Immediately after the report, run `inject_highlights.py` to apply markers. **Always include the flow diagram via the `--diagram` flag** so it is persisted as a "Feature Map" at the top of the first file.
 
 ```bash
 python scripts/inject_highlights.py \
   --feature "feature name" \
-  --files "Role|Layer|path:start:end" "Another Role|Another Layer|path:start:end"
+  --diagram "  [Entry] ──► [Logic] ──► [DB]" \
+  --files "Role|Layer|path:start:end" ...
 ```
 
 Then conclude your response with:
-_"✅ I have also injected bright highlight markers into these [N] files so you can see them in your editor."_
+_"✅ I have injected highlight markers and updated the **PLUTO_DASHBOARD.md**. Keep the dashboard open on your side-panel for persistent navigation!"_
 
 ### Rules for Injecting Highlights
 

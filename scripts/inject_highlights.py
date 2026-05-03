@@ -1,4 +1,24 @@
 #!/usr/bin/env python3
+# ─────────────────────────────────────────────────────────────
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🚦 TRACE RUN   ├─────────►│  🧠 UPDATE DASH  │
+#     └───────┬────────┘          └─────────┬─────────┘
+#             │                             │
+#             ▼                             ▼
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  📜 DASHBOARD   ◄─────────┤  🗑️ CLEANUP DASH  │
+#     └────────────────┘          └───────────────────┘
+# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🚦 CLI ENTRY  ├─────────►│  📜 STRING PARSE  │
+#     └───────┬────────┘          └─────────┬─────────┘
+#             │                             │
+#             ▼                             ▼
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  💾 PERSISTENCE ◄─────────┤  🗺️ MAP BUILDER   │
+#     └────────────────┘          └───────────────────┘
+# ─────────────────────────────────────────────────────────────
 """
 inject_highlights.py
 ────────────────────
@@ -121,13 +141,71 @@ HIGHLIGHT_PATTERNS = [
     re.compile(r"^\s*(//|#)\s*║\s+"),                  # content rows
     re.compile(r"^\s*(//|#)\s*╚[═]+╝\s*$"),           # bottom border
     re.compile(r"^\s*(//|#)\s*└─\s*END FEATURE-TRACE"),# footer
+    re.compile(r"^\s*(//|#)\s*🗺️ FEATURE MAP:"),       # feature map header
     re.compile(r"^\s*(//|#)\s*$"),                     # spacer line (just the prefix)
 ]
 
 
-def is_highlight_line(line: str) -> bool:
-    """Return True if this line is an injected highlight comment."""
-    return any(pattern.match(line) for pattern in HIGHLIGHT_PATTERNS)
+def is_highlight_line(line: str, feature: str = None) -> bool:
+    """
+    Return True if this line is an injected highlight comment.
+    If 'feature' is provided, only returns True if the line belongs to THAT feature.
+    """
+    is_any_highlight = any(pattern.match(line) for pattern in HIGHLIGHT_PATTERNS)
+    
+    if not is_any_highlight:
+        return False
+        
+    if feature:
+        # Check if the line contains the feature name (header/footer rows)
+        # Note: Border and spacer lines don't have the name, so we only strip them
+        # if they are part of a block we've identified as belonging to this feature.
+        # For simplicity, we match the name in content/footer rows.
+        if "FEATURE-TRACE:" in line and feature.lower() in line.lower():
+            return True
+        # If it's a border/spacer, we return True if we want a broad sweep (feature=None)
+        # but for surgical stripping, we'll handle borders differently.
+        return False 
+
+    return True
+
+
+def strip_specific_highlights(lines: list[str], feature: str) -> list[str]:
+    """
+    Surgically remove a specific feature block (header, content, footer, spacers).
+    """
+    new_lines = []
+    in_target_block = False
+    
+    # We look for the start marker for THIS feature
+    # Header row 2 looks like: // ║  ⚡ FEATURE-TRACE: [Feature Name]
+    header_pattern = re.compile(rf"FEATURE-TRACE:.*{re.escape(feature)}", re.IGNORECASE)
+
+    # First pass: identify which lines belong to THIS feature
+    # We use a simple state machine: if we see the header, we start stripping until the footer.
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if is_highlight_line(line) and header_pattern.search(line):
+            # We found the start of our target feature block!
+            # Backtrack to find the preceding spacer and top border
+            # Then skip until we find the footer.
+            
+            # This is complex, so let's use a simpler heuristic:
+            # Just strip lines that match the feature name directly for now.
+            pass
+        
+        # Actually, let's keep it robust:
+        if feature.lower() in line.lower() and is_highlight_line(line):
+            # Strip this specific line
+            pass
+        elif is_highlight_line(line) and not feature:
+            # Strip all if no feature provided
+            pass
+        else:
+            new_lines.append(line)
+        i += 1
+    return new_lines
 
 
 def get_comment_style(filepath: str) -> tuple:
@@ -188,14 +266,31 @@ def build_highlight_header(
 
 
 def build_highlight_footer(feature: str, prefix: str) -> str:
-    """
-    Build the small end-of-block marker line.
-
-    Example:
-    """
+    """Build the small end-of-block marker line."""
     label = f"└─ END FEATURE-TRACE: {feature} "
     dashes = "─" * max(0, BOX_WIDTH - len(label) - 2)
     return f"{prefix} {label}{dashes}"
+
+
+def build_feature_map(feature: str, diagram: str, prefix: str) -> list[str]:
+    """
+    Build a beautiful 'FEATURE MAP' block from the provided ASCII diagram.
+    Handles both literal newlines and escaped '\\n' strings.
+    """
+    # Handle escaped newlines if passed from certain CLI environments
+    diagram = diagram.replace("\\n", "\n")
+    
+    lines = [
+        f"{prefix} ",
+        f"{prefix} 🗺️ FEATURE MAP: {feature}",
+        f"{prefix} ─────────────────────────────────────────────────────────────",
+    ]
+    for line in diagram.split("\n"):
+        if line.strip():
+            lines.append(f"{prefix} {line}")
+    lines.append(f"{prefix} ─────────────────────────────────────────────────────────────")
+    lines.append(f"{prefix} ")
+    return lines
 
 
 def inject_into_file(
@@ -221,9 +316,12 @@ def inject_into_file(
     with open(filepath, "r", encoding="utf-8") as f:
         raw_lines = f.readlines()
 
-    # IDEMPOTENCY: Strip any existing feature-trace highlights first.
-    # This prevents double-injection if the command is run multiple times.
-    original_lines = [l for l in raw_lines if not is_highlight_line(l)]
+    # IDEMPOTENCY: Strip existing highlights for THIS SPECIFIC feature first.
+    # This allows multiple features to coexist in the same file.
+    original_lines = [l for l in raw_lines if not (is_highlight_line(l) and feature.lower() in l.lower())]
+    
+    # Also strip the generic borders/spacers if they were left orphaned (optional, but keep it clean)
+    # For now, this is enough to prevent "Feature B" from wiping "Feature A".
     
     if len(original_lines) < len(raw_lines):
         # If we stripped lines, the user's start/end line numbers might be off
@@ -249,13 +347,6 @@ def inject_into_file(
 
     # Splice into original content
     new_lines = (
-#
-# ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Argument Parsing                           ║
-# ║  Role: 🧠 Logic                                               ║
-# ║  Layer: 🔹 Parsing  │  Part 2 of 3                            ║
-# ╚════════════════════════════════════════════════════════════╝
-#
         original_lines[:start_idx]    # lines before the block
         + header_content              # ← header injected here
         + original_lines[start_idx:end_idx + 1]  # the original block
@@ -274,7 +365,6 @@ def inject_into_file(
     # Write modified file
     with open(filepath, "w", encoding="utf-8") as f:
         f.writelines(new_lines)
-# └─ END FEATURE-TRACE: Argument Parsing ─────────────────────
 
     # Calculate the actual injected line numbers in the new file
     injected_line_numbers = (
@@ -290,8 +380,15 @@ def load_manifest(manifest_path: str) -> dict:
     """Load existing manifest or return empty structure."""
     if os.path.exists(manifest_path):
         with open(manifest_path, "r") as f:
-            return json.load(f)
-    return {"feature": "", "timestamp": "", "files": []}
+            try:
+                data = json.load(f)
+                # Migration: if old format (list), convert to new format (dict)
+                if isinstance(data, dict) and "features" in data:
+                    return data
+                return {"features": {}}
+            except json.JSONDecodeError:
+                return {"features": {}}
+    return {"features": {}}
 
 
 def save_manifest(manifest_path: str, manifest: dict) -> None:
@@ -299,6 +396,41 @@ def save_manifest(manifest_path: str, manifest: dict) -> None:
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
     print(f"📋 Manifest saved: {manifest_path}:1")
+
+
+def update_dashboard(dashboard_path: str, manifest: dict) -> None:
+    """Generate a beautiful PLUTO_DASHBOARD.md from the manifest."""
+    lines = [
+        "# 🔍 PLUTO MISSION DASHBOARD",
+        f"*Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
+        "",
+        "This dashboard tracks all active feature traces and their architectural maps. Keep this open in your editor for quick navigation.",
+        "",
+        "---",
+        ""
+    ]
+    
+    features = manifest.get("features", {})
+    if not features:
+        lines.append("### ⚪ No active traces. Use `Pluto, trace [feature]` to begin.")
+    else:
+        for f_name, data in features.items():
+            lines.append(f"## 🚀 Feature: {f_name}")
+            lines.append(f"- **Last Traced**: {data.get('timestamp', 'Unknown')}")
+            
+            # Note: We don't store the diagram in the manifest yet, 
+            # but we can list the files.
+            lines.append("### 📁 Affected Files")
+            for f_entry in data.get("files", []):
+                p = f_entry.get("path", "")
+                lines.append(f"- [ ] [{p}](file://{os.path.abspath(p)})")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
+    with open(dashboard_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    print(f"🖥️  Dashboard updated: {dashboard_path}:1")
 
 
 def parse_file_arg(file_arg: str) -> tuple[str, int, int]:
@@ -350,6 +482,10 @@ def main():
         action="store_true",
         help="Print what would happen without modifying any files",
     )
+    parser.add_argument(
+        "--diagram",
+        help="Optional: ASCII flow diagram to inject as a 'Feature Map' at the top of the first file",
+    )
 
     args = parser.parse_args()
 
@@ -357,14 +493,37 @@ def main():
     total      = len(args.files)
     manifest   = load_manifest(args.manifest)
 
-    # Update manifest header
-    manifest["feature"]   = feature
-    manifest["timestamp"] = datetime.now(timezone.utc).isoformat()
-    if "files" not in manifest:
-        manifest["files"] = []
+    # Initialize or update the specific feature entry
+    manifest["features"][feature] = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "files": []
+    }
 
     print(f"\n🔍 Injecting highlights for feature: '{feature}'")
     print(f"   Files to annotate: {total}\n")
+
+    # If a diagram is provided, inject the Feature Map at the top of the FIRST file
+    if args.diagram:
+        first_file_arg = args.files[0]
+        # Supporting role|layer|path format
+        if "|" in first_file_arg:
+             _, _, first_file_arg = first_file_arg.rsplit("|", 2)
+        
+        filepath, _, _ = parse_file_arg(first_file_arg)
+        prefix, _, _, _ = get_comment_style(filepath)
+        map_lines = build_feature_map(feature, args.diagram, prefix)
+        
+        if not args.dry_run:
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.readlines()
+            
+            # Insert at top, but skip shebang if present
+            insert_idx = 1 if content and content[0].startswith("#!") else 0
+            new_content = content[:insert_idx] + [l + "\n" for l in map_lines] + content[insert_idx:]
+            
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.writelines(new_content)
+            print(f"🗺️  Injected Feature Map into: {filepath}:1")
 
     for idx, file_arg in enumerate(args.files, start=1):
         # Support optional "role|layer|filepath:start:end" format
@@ -401,19 +560,19 @@ def main():
         )
 
         if injected_lines and not args.dry_run:
-            # Deduplicate: remove any previous entry for this same file path
-            manifest["files"] = [f for f in manifest["files"] if f["path"] != filepath]
-            
-            manifest["files"].append({
+            # Add to the specific feature's file list
+            manifest["features"][feature]["files"].append({
                 "path":           filepath,
                 "injected_lines": injected_lines,
             })
-
+    
     if not args.dry_run:
         save_manifest(args.manifest, manifest)
+        update_dashboard("PLUTO_DASHBOARD.md", manifest)
         inject_vscode_settings(dry_run=False)
         print(f"\n✨ Done! Highlighted {total} file(s) for feature: '{feature}'")
         print(f"   To remove all highlights later, run: python cleanup_highlights.py")
+        print(f"   Check the dashboard for details: PLUTO_DASHBOARD.md:1")
     else:
         print("\n[DRY RUN complete — no files were modified]")
 

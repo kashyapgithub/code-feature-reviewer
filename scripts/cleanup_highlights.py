@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
+# ─────────────────────────────────────────────────────────────
+# 🚦 CLI ──► 🧠 Logic ──► 🗑️ Cleanup
+# ─────────────────────────────────────────────────────────────
 """
 cleanup_highlights.py
 ─────────────────────
 Removes all feature-trace highlight comments previously injected by
-inject_highlights.py. Uses the manifest file to find affected files,
-then strips out every injected comment line.
-
-Usage:
-    python cleanup_highlights.py
-    python cleanup_highlights.py --manifest .feature-trace-manifest.json
-    python cleanup_highlights.py --dry-run
-
-Arguments:
-    --manifest  Path to the manifest JSON file (default: .feature-trace-manifest.json)
-    --dry-run   Show what would be removed without modifying any files
-    --force     Remove highlight comments even if manifest is missing
-                (scans all source files in current directory)
+inject_highlights.py. Supports surgical removal of specific features.
 """
 
 import argparse
@@ -23,6 +14,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 
 
 # ─────────────────────────────────────────────────────────────
@@ -32,39 +24,37 @@ import sys
 
 # Matches box-drawing characters used in header/footer
 HIGHLIGHT_PATTERNS = [
-    re.compile(r"^\s*(//|#)\s*╔[═]+╗\s*$"),          # top border:    // ╔════╗
-    re.compile(r"^\s*(//|#)\s*║\s+"),                  # content rows:  // ║  text  ║
-    re.compile(r"^\s*(//|#)\s*╚[═]+╝\s*$"),           # bottom border: // ╚════╝
-    re.compile(r"^\s*(//|#)\s*└─\s*END FEATURE-TRACE"),# footer:        // └─ END FEATURE-TRACE...
-    re.compile(r"^\s*(//|#)\s*$"),                     # spacer line:   // 
+    re.compile(r"^\s*(//|#)\s*╔[═]+╗\s*$"),          # top border
+    re.compile(r"^\s*(//|#)\s*║\s+"),                  # content rows
+    re.compile(r"^\s*(//|#)\s*╚[═]+╝\s*$"),           # bottom border
+    re.compile(r"^\s*(//|#)\s*└─\s*END FEATURE-TRACE"),# footer
+    re.compile(r"^\s*(//|#)\s*$"),                     # spacer line
 ]
 
-# Source file extensions to scan in --force mode
-SOURCE_EXTENSIONS = {
-    ".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs",
-    ".py", ".go", ".rs", ".rb",
-    ".java", ".kt", ".php", ".swift",
-    ".c", ".cpp", ".h",
-    ".vue", ".svelte", ".sh", ".bash",
-}
 
-# Directories to always skip
-SKIP_DIRS = {
-    "node_modules", ".git", "dist", "build",
-    "__pycache__", ".next", "vendor", "venv", ".venv",
-}
-
-
-def is_highlight_line(line: str) -> bool:
-    """Return True if this line is an injected highlight comment."""
-    return any(pattern.match(line) for pattern in HIGHLIGHT_PATTERNS)
-
-
-def clean_file(filepath: str, dry_run: bool = False) -> int:
+def is_highlight_line(line: str, feature: str = None) -> bool:
     """
-    Remove all highlight comment lines from the given file.
+    Return True if this line is an injected highlight comment.
+    If 'feature' is provided, only returns True if the line belongs to THAT feature.
+    """
+    is_any_highlight = any(pattern.match(line) for pattern in HIGHLIGHT_PATTERNS)
+    
+    if not is_any_highlight:
+        return False
+        
+    if feature:
+        # For simplicity, we match the name in content/footer rows.
+        if "FEATURE-TRACE:" in line and feature.lower() in line.lower():
+            return True
+        return False 
 
-    Returns the number of lines removed.
+    return True
+
+
+def clean_file(filepath: str, dry_run: bool = False, feature: str = None) -> int:
+    """
+    Remove highlight comment lines from a file.
+    If 'feature' is provided, ONLY removes lines belonging to that feature.
     """
     try:
         with open(filepath, "r", encoding="utf-8") as f:
@@ -73,11 +63,18 @@ def clean_file(filepath: str, dry_run: bool = False) -> int:
         print(f"⚠️  Could not read {filepath}: {e}")
         return 0
 
-    cleaned_lines   = [line for line in original_lines if not is_highlight_line(line)]
-    removed_count   = len(original_lines) - len(cleaned_lines)
+    # Filter out highlight lines
+    if feature:
+        # Surgical strip: only remove lines that are highlight lines AND match the feature
+        cleaned_lines = [l for l in original_lines if not (is_highlight_line(l, feature=feature))]
+    else:
+        # Broad strip: remove ALL highlight lines
+        cleaned_lines = [l for l in original_lines if not is_highlight_line(l)]
+
+    removed_count = len(original_lines) - len(cleaned_lines)
 
     if removed_count == 0:
-        return 0  # Nothing to clean in this file
+        return 0
 
     if dry_run:
         print(f"[DRY RUN] Would remove {removed_count} highlight line(s) from: {filepath}")
@@ -90,50 +87,85 @@ def clean_file(filepath: str, dry_run: bool = False) -> int:
     return removed_count
 
 
-#
-# ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Argument Parsing                           ║
-# ║  Role: 💾 Persistence                                         ║
-# ║  Layer: 🔹 Manifest  │  Part 3 of 3                           ║
-# ╚════════════════════════════════════════════════════════════╝
-#
-def load_manifest(manifest_path: str) -> dict | None:
-    """Load manifest JSON. Returns None if the file does not exist."""
-    if not os.path.exists(manifest_path):
-        return None
-    with open(manifest_path, "r") as f:
-        return json.load(f)
+def load_manifest(manifest_path: str) -> dict:
+    """Load existing manifest or return empty structure."""
+    if os.path.exists(manifest_path):
+        with open(manifest_path, "r") as f:
+            try:
+                data = json.load(f)
+                if isinstance(data, dict) and "features" in data:
+                    return data
+                return {"features": {}}
+            except json.JSONDecodeError:
+                return {"features": {}}
+    return {"features": {}}
 
-# └─ END FEATURE-TRACE: Argument Parsing ─────────────────────
+
+def update_dashboard(dashboard_path: str, manifest: dict) -> None:
+    """Generate a beautiful PLUTO_DASHBOARD.md from the manifest."""
+    lines = [
+        "# 🔍 PLUTO MISSION DASHBOARD",
+        f"*Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
+        "",
+        "This dashboard tracks all active feature traces and their architectural maps. Keep this open in your editor for quick navigation.",
+        "",
+        "---",
+        ""
+    ]
+    
+    features = manifest.get("features", {})
+    if not features:
+        lines.append("### ⚪ No active traces. Use `Pluto, trace [feature]` to begin.")
+    else:
+        for f_name, data in features.items():
+            lines.append(f"## 🚀 Feature: {f_name}")
+            lines.append(f"- **Last Traced**: {data.get('timestamp', 'Unknown')}")
+            lines.append("### 📁 Affected Files")
+            for f_entry in data.get("files", []):
+                p = f_entry.get("path", "")
+                lines.append(f"- [ ] [{p}](file://{os.path.abspath(p)})")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
+    with open(dashboard_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    print(f"🖥️  Dashboard updated: {dashboard_path}:1")
+
 
 def delete_manifest(manifest_path: str, dry_run: bool = False) -> None:
     """Remove the manifest file after cleanup."""
     if dry_run:
         print(f"[DRY RUN] Would delete manifest: {manifest_path}")
         return
-    os.remove(manifest_path)
-    print(f"🗑️  Deleted manifest: {manifest_path}:1")
+    if os.path.exists(manifest_path):
+        os.remove(manifest_path)
+        print(f"🗑️  Deleted manifest: {manifest_path}:1")
 
 
 def collect_source_files(root: str = ".") -> list[str]:
-    """
-    Walk the directory tree and collect all source files
-    (used in --force mode when there's no manifest).
-    """
-    found = []
+    """Find all source files in the current directory tree."""
+    SOURCE_EXTENSIONS = {
+        ".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs",
+        ".py", ".go", ".rs", ".rb",
+        ".java", ".kt", ".php", ".swift",
+        ".c", ".cpp", ".h",
+        ".vue", ".svelte", ".sh", ".bash",
+    }
+    SKIP_DIRS = {
+        "node_modules", ".git", "dist", "build",
+        "__pycache__", ".next", "vendor", "venv", ".venv",
+    }
+
+    found_files = []
     for dirpath, dirnames, filenames in os.walk(root):
-        # Prune ignored directories in-place so os.walk skips them
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
-        for filename in filenames:
-            _, ext = os.path.splitext(filename)
+        for f in filenames:
+            _, ext = os.path.splitext(f)
             if ext.lower() in SOURCE_EXTENSIONS:
-                found.append(os.path.join(dirpath, filename))
-    return found
+                found_files.append(os.path.join(dirpath, f))
+    return found_files
 
-
-# ─────────────────────────────────────────────────────────────
-# CLI entrypoint
-# ─────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(
@@ -154,68 +186,89 @@ def main():
         action="store_true",
         help="Scan all source files even without a manifest (slower, but thorough)",
     )
+    parser.add_argument(
+        "--feature",
+        help="Optional: Only clean highlights for a specific feature",
+    )
 
-    args       = parser.parse_args()
-    manifest   = load_manifest(args.manifest)
+    args = parser.parse_args()
+    manifest = load_manifest(args.manifest)
 
     # ── Mode 1: Use manifest (fast, targeted) ────────────────
-    if manifest and not args.force:
-        feature = manifest.get("feature", "unknown feature")
-        files   = manifest.get("files", [])
-
-        print(f"\n🔍 Cleaning highlights for feature: '{feature}'")
-        print(f"   Files in manifest: {len(files)}\n")
+    if manifest.get("features") and not args.force:
+        features_data = manifest["features"]
+        
+        target_features = []
+        if args.feature:
+            if args.feature in features_data:
+                target_features = [args.feature]
+            else:
+                print(f"⚠️  Feature '{args.feature}' not found in manifest.")
+                sys.exit(1)
+        else:
+            target_features = list(features_data.keys())
 
         total_removed = 0
         cleaned_count = 0
 
-        for entry in files:
-            filepath = entry.get("path", "")
-            if not filepath:
-                continue
-            if not os.path.exists(filepath):
-                print(f"⚠️  Skipping (not found): {filepath}")
-                continue
+        for f_name in target_features:
+            print(f"\n🔍 Cleaning highlights for feature: '{f_name}'")
+            files = features_data[f_name].get("files", [])
+            
+            for entry in files:
+                filepath = entry.get("path", "")
+                if not filepath or not os.path.exists(filepath):
+                    continue
 
-            removed = clean_file(filepath, dry_run=args.dry_run)
-            if removed > 0:
-                total_removed += removed
-                cleaned_count += 1
+                removed = clean_file(filepath, dry_run=args.dry_run, feature=f_name)
+                if removed > 0:
+                    total_removed += removed
+                    cleaned_count += 1
+            
+            if not args.dry_run:
+                del features_data[f_name]
 
         if not args.dry_run:
-            delete_manifest(args.manifest, dry_run=False)
+            if not features_data:
+                delete_manifest(args.manifest, dry_run=False)
+                if os.path.exists("PLUTO_DASHBOARD.md"):
+                    os.remove("PLUTO_DASHBOARD.md")
+                    print(f"🗑️  Deleted dashboard: PLUTO_DASHBOARD.md:1")
+            else:
+                with open(args.manifest, "w") as f:
+                    json.dump(manifest, f, indent=2)
+                update_dashboard("PLUTO_DASHBOARD.md", manifest)
+                print(f"\n📋 Manifest updated: {args.manifest}:1")
+                
             print(f"\n✅ Cleanup complete!")
-            print(f"   Files cleaned:    {cleaned_count}")
             print(f"   Lines removed:    {total_removed}")
         else:
             print(f"\n[DRY RUN] Would remove ~{total_removed} line(s) from {cleaned_count} file(s)")
 
     # ── Mode 2: No manifest — scan everything (--force) ──────
-    elif args.force or manifest is None:
-        if not args.force and manifest is None:
-            print(f"⚠️  No manifest found at '{args.manifest}'.")
+    else:
+        if not args.force and not manifest.get("features"):
+            print(f"⚠️  No active features found in manifest '{args.manifest}'.")
             print("   Run with --force to scan all source files for highlight comments.")
             sys.exit(1)
 
         print(f"\n🔍 Force mode: scanning all source files for highlight comments...")
-        source_files  = collect_source_files(".")
+        source_files = collect_source_files(".")
         total_removed = 0
         cleaned_count = 0
 
         for filepath in source_files:
-            removed = clean_file(filepath, dry_run=args.dry_run)
+            removed = clean_file(filepath, dry_run=args.dry_run, feature=args.feature)
             if removed > 0:
                 total_removed += removed
                 cleaned_count += 1
 
-        # Also remove manifest if it exists
-        if os.path.exists(args.manifest) and not args.dry_run:
+        if os.path.exists(args.manifest) and not args.dry_run and not args.feature:
             delete_manifest(args.manifest, dry_run=False)
 
         if not args.dry_run:
             print(f"\n✅ Force cleanup complete!")
             print(f"   Source files scanned: {len(source_files)}")
-            print(f"   Files cleaned:        {cleaned_count}")
             print(f"   Lines removed:        {total_removed}")
         else:
             print(f"\n[DRY RUN] Scanned {len(source_files)} files.")
