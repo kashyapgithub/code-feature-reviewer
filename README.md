@@ -1,7 +1,19 @@
 # 🔍 PLUTO — Product-Level Universal Trace & Orchestrator
 
-> *"Pluto, show me all the code responsible for the checkout flow."*
-> → **PLUTO** finds every file, explains each one's role, and highlights the exact lines in your editor.
+> **"Pluto, trace the checkout flow."**  
+> → Finds every file, explains the logic, and **highlights the code in your editor.**
+
+---
+
+### ⏱️ PLUTO in 60 Seconds
+**PLUTO** turns AI "hallucinations" into **Visual Code Archaeology**. It solves the problem of "where is this feature implemented?" across complex, multi-file codebases.
+
+1. **ARCHAEOLOGY**: Pluto performs a 6-pass search (Keyword, Route, Dependency, etc.) to find every scrap of code responsible for a feature.
+2. **ILLUMINATION**: Pluto injects bright, non-destructive **box-art markers** (╔══ ⚡ ══╗) directly into your source files.
+3. **NAVIGATION**: You open any file and follow the "golden trail" to see the execution flow with emojis (💾, 🧠, 🎼) guiding you.
+4. **RECOVERY**: One command to strip all markers, leaving your codebase 100% untouched and original.
+
+---
 
 **PLUTO** is a Claude skill that performs **Feature Archaeology** — trace any product feature or operation across your entire codebase, then inject bright visual markers so you can navigate the code instantly.
 
