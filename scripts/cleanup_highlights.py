@@ -107,7 +107,8 @@ def update_dashboard(dashboard_path: str, manifest: dict) -> None:
         "# 🔍 PLUTO MISSION DASHBOARD",
         f"*Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
         "",
-        "This dashboard tracks all active feature traces and their architectural maps. Keep this open in your editor for quick navigation.",
+        "> [!NOTE]",
+        "> This dashboard tracks all active feature traces. Keep this open in your editor for quick architectural navigation.",
         "",
         "---",
         ""
@@ -115,15 +116,19 @@ def update_dashboard(dashboard_path: str, manifest: dict) -> None:
     
     features = manifest.get("features", {})
     if not features:
-        lines.append("### ⚪ No active traces. Use `Pluto, trace [feature]` to begin.")
+        lines.append("> [!TIP]")
+        lines.append("> No active traces. Use `Pluto, trace [feature]` to begin.")
     else:
         for f_name, data in features.items():
             lines.append(f"## 🚀 Feature: {f_name}")
-            lines.append(f"- **Last Traced**: {data.get('timestamp', 'Unknown')}")
-            lines.append("### 📁 Affected Files")
+            lines.append(f"> [!IMPORTANT]")
+            lines.append(f"> **Mission Active**: Trace recorded at {data.get('timestamp', 'Unknown')}")
+            lines.append("")
+            lines.append("### 📁 Mission Assets")
             for f_entry in data.get("files", []):
                 p = f_entry.get("path", "")
-                lines.append(f"- [ ] [{p}](file://{os.path.abspath(p)})")
+                abs_p = os.path.abspath(p)
+                lines.append(f"- [ ] [{p}](file://{abs_p})")
             lines.append("")
             lines.append("---")
             lines.append("")
@@ -131,6 +136,31 @@ def update_dashboard(dashboard_path: str, manifest: dict) -> None:
     with open(dashboard_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     print(f"🖥️  Dashboard updated: {dashboard_path}:1")
+
+
+def print_alert(alert_type: str, message: str) -> None:
+    """Print a beautiful, color-coded alert to the CLI."""
+    # ANSI Color Codes
+    COLORS = {
+        "IMPORTANT": "\033[91m", # Red
+        "TIP":       "\033[92m", # Green
+        "NOTE":      "\033[94m", # Blue
+        "RESET":     "\033[0m",
+        "BOLD":      "\033[1m",
+    }
+    
+    icon = "⚡" if alert_type == "IMPORTANT" else "💡" if alert_type == "TIP" else "ℹ️"
+    color = COLORS.get(alert_type, COLORS["RESET"])
+    reset = COLORS["RESET"]
+    bold  = COLORS["BOLD"]
+    
+    width = 70
+    border = f"{color}╔{'═' * (width - 2)}╗{reset}"
+    footer = f"{color}╚{'═' * (width - 2)}╝{reset}"
+    
+    print(f"\n{border}")
+    print(f"{color}║  {bold}[!{alert_type}]{reset} {icon} {message}")
+    print(f"{footer}")
 
 
 def delete_manifest(manifest_path: str, dry_run: bool = False) -> None:
@@ -233,17 +263,15 @@ def main():
                 delete_manifest(args.manifest, dry_run=False)
                 if os.path.exists("PLUTO_DASHBOARD.md"):
                     os.remove("PLUTO_DASHBOARD.md")
-                    print(f"🗑️  Deleted dashboard: PLUTO_DASHBOARD.md:1")
+                    print_alert("IMPORTANT", "Deleted dashboard: PLUTO_DASHBOARD.md")
             else:
                 with open(args.manifest, "w") as f:
                     json.dump(manifest, f, indent=2)
                 update_dashboard("PLUTO_DASHBOARD.md", manifest)
-                print(f"\n📋 Manifest updated: {args.manifest}:1")
                 
-            print(f"\n✅ Cleanup complete!")
-            print(f"   Lines removed:    {total_removed}")
+            print_alert("TIP", f"Cleanup complete! Removed {total_removed} lines.")
         else:
-            print(f"\n[DRY RUN] Would remove ~{total_removed} line(s) from {cleaned_count} file(s)")
+            print_alert("NOTE", f"Dry run: would remove ~{total_removed} line(s) from {cleaned_count} file(s)")
 
     # ── Mode 2: No manifest — scan everything (--force) ──────
     else:
@@ -267,12 +295,10 @@ def main():
             delete_manifest(args.manifest, dry_run=False)
 
         if not args.dry_run:
-            print(f"\n✅ Force cleanup complete!")
+            print_alert("TIP", f"Force cleanup complete! Removed {total_removed} lines.")
             print(f"   Source files scanned: {len(source_files)}")
-            print(f"   Lines removed:        {total_removed}")
         else:
-            print(f"\n[DRY RUN] Scanned {len(source_files)} files.")
-            print(f"   Would clean {cleaned_count} file(s), removing ~{total_removed} line(s)")
+            print_alert("NOTE", f"Dry run: scanned {len(source_files)} files. Would remove ~{total_removed} lines.")
 
 
 if __name__ == "__main__":

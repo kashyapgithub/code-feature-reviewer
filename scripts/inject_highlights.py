@@ -1,6 +1,26 @@
 #!/usr/bin/env python3
 # ─────────────────────────────────────────────────────────────
 #     ┌────────────────┐          ┌───────────────────┐
+#     │  🚦 CLI LOG    ├─────────►│  🧠 print_alert  │
+#     └───────┬────────┘          └─────────┬─────────┘
+#             │                             │
+#             ▼                             ▼
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🎨 COLOR UI   ├─────────►│  📜 TERMINAL     │
+#     └────────────────┘          └───────────────────┘
+# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🚦 DASHBOARD   ├─────────►│  🎨 GITHUB ALERTS │
+#     └───────┬────────┘          └─────────┬─────────┘
+#             │                             │
+#             ▼                             ▼
+#     ┌────────────────┐          ┌───────────────────┐
+#     │  🧩 UI RENDERING◄─────────┤  📄 MISSION LOG   │
+#     └────────────────┘          └───────────────────┘
+# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+#     ┌────────────────┐          ┌───────────────────┐
 #     │  🚦 TRACE RUN   ├─────────►│  🧠 UPDATE DASH  │
 #     └───────┬────────┘          └─────────┬─────────┘
 #             │                             │
@@ -404,7 +424,8 @@ def update_dashboard(dashboard_path: str, manifest: dict) -> None:
         "# 🔍 PLUTO MISSION DASHBOARD",
         f"*Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
         "",
-        "This dashboard tracks all active feature traces and their architectural maps. Keep this open in your editor for quick navigation.",
+        "> [!NOTE]",
+        "> This dashboard tracks all active feature traces. Keep this open in your editor for quick architectural navigation.",
         "",
         "---",
         ""
@@ -412,25 +433,53 @@ def update_dashboard(dashboard_path: str, manifest: dict) -> None:
     
     features = manifest.get("features", {})
     if not features:
-        lines.append("### ⚪ No active traces. Use `Pluto, trace [feature]` to begin.")
+        lines.append("> [!TIP]")
+        lines.append("> No active traces. Use `Pluto, trace [feature]` to begin.")
     else:
         for f_name, data in features.items():
             lines.append(f"## 🚀 Feature: {f_name}")
-            lines.append(f"- **Last Traced**: {data.get('timestamp', 'Unknown')}")
+            lines.append(f"> [!IMPORTANT]")
+            lines.append(f"> **Mission Active**: Trace recorded at {data.get('timestamp', 'Unknown')}")
+            lines.append("")
             
-            # Note: We don't store the diagram in the manifest yet, 
-            # but we can list the files.
-            lines.append("### 📁 Affected Files")
+            lines.append("### 📁 Mission Assets")
             for f_entry in data.get("files", []):
                 p = f_entry.get("path", "")
-                lines.append(f"- [ ] [{p}](file://{os.path.abspath(p)})")
+                # Use absolute path for clickable link
+                abs_p = os.path.abspath(p)
+                lines.append(f"- [ ] [{p}](file://{abs_p})")
             lines.append("")
             lines.append("---")
             lines.append("")
 
     with open(dashboard_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"🖥️  Dashboard updated: {dashboard_path}:1")
+    print_alert("NOTE", f"Dashboard updated: {dashboard_path}")
+
+
+def print_alert(alert_type: str, message: str) -> None:
+    """Print a beautiful, color-coded alert to the CLI."""
+    # ANSI Color Codes
+    COLORS = {
+        "IMPORTANT": "\033[91m", # Red
+        "TIP":       "\033[92m", # Green
+        "NOTE":      "\033[94m", # Blue
+        "RESET":     "\033[0m",
+        "BOLD":      "\033[1m",
+    }
+    
+    icon = "⚡" if alert_type == "IMPORTANT" else "💡" if alert_type == "TIP" else "ℹ️"
+    color = COLORS.get(alert_type, COLORS["RESET"])
+    reset = COLORS["RESET"]
+    bold  = COLORS["BOLD"]
+    
+    width = 70
+    border = f"{color}╔{'═' * (width - 2)}╗{reset}"
+    footer = f"{color}╚{'═' * (width - 2)}╝{reset}"
+    
+    print(f"\n{border}")
+    print(f"{color}║  {bold}[!{alert_type}]{reset} {icon} {message}")
+    print(f"{footer}")
 
 
 def parse_file_arg(file_arg: str) -> tuple[str, int, int]:
@@ -570,11 +619,10 @@ def main():
         save_manifest(args.manifest, manifest)
         update_dashboard("PLUTO_DASHBOARD.md", manifest)
         inject_vscode_settings(dry_run=False)
-        print(f"\n✨ Done! Highlighted {total} file(s) for feature: '{feature}'")
-        print(f"   To remove all highlights later, run: python cleanup_highlights.py")
-        print(f"   Check the dashboard for details: PLUTO_DASHBOARD.md:1")
+        print_alert("TIP", f"Highlighted {total} file(s) for feature: '{feature}'")
+        print(f"   To remove highlights: python3 scripts/cleanup_highlights.py")
     else:
-        print("\n[DRY RUN complete — no files were modified]")
+        print_alert("NOTE", "Dry run complete — no files were modified")
 
 
 def inject_vscode_settings(dry_run: bool = False) -> None:
