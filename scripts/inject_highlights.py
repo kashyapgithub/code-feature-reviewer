@@ -79,6 +79,36 @@ DEFAULT_COMMENT = ("#", "#", "#", "#")
 # Width of the highlight box
 BOX_WIDTH = 62
 
+ROLE_EMOJIS = {
+    "workflow": "🛠️",
+    "scripts":  "📜",
+    "ui":       "🎨",
+    "api":      "🔌",
+    "backend":  "⚙️",
+    "frontend": "💻",
+    "database": "🗄️",
+    "config":   "⚙️",
+    "test":     "🧪",
+    "docs":     "📄",
+    "persistence": "💾",
+}
+
+LAYER_EMOJIS = {
+    "core":      "🧠",
+    "shell":     "🐚",
+    "service":   "🏗️",
+    "page":      "📄",
+    "component": "🧩",
+    "style":     "💅",
+    "scripts":   "📜",
+}
+
+
+def get_emoji(text: str, mapping: dict) -> str:
+    """Return an emoji for the given text if a mapping exists."""
+    return mapping.get(text.lower().strip(), "")
+
+
 # Patterns that identify injected highlight comment lines
 HIGHLIGHT_PATTERNS = [
     re.compile(r"^\s*(//|#)\s*╔[═]+╗\s*$"),          # top border
@@ -126,10 +156,15 @@ def build_highlight_header(
     
     # Manually pad each content row
     title_text  = f"⚡ FEATURE-TRACE: {feature}"
-    role_text   = f"Role: {role}" if role else ""
-    layer_text  = f"Layer: {layer}  │  Part {part_index} of {part_total}"
+    r_emoji = get_emoji(role, ROLE_EMOJIS)
+    l_emoji = get_emoji(layer, LAYER_EMOJIS)
+
+    role_text   = f"Role: {r_emoji + ' ' if r_emoji else ''}{role}" if role else ""
+    layer_text  = f"Layer: {l_emoji + ' ' if l_emoji else ''}{layer}  │  Part {part_index} of {part_total}"
 
     def box_line(text: str) -> str:
+        # Handle emoji width (most emojis are double-width in display but single char in string)
+        # This is a simple approximation; true terminal width is hard.
         padded = text + " " * max(0, inner_width - len(text))
         return f"{prefix} ║  {padded}  ║"
 
@@ -312,6 +347,13 @@ def main():
     manifest["feature"]   = feature
     manifest["timestamp"] = datetime.now(timezone.utc).isoformat()
     if "files" not in manifest:
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
+# ║  Role: 🛠️ Workflow                                           ║
+# ║  Layer: 🧠 Core  │  Part 3 of 4                               ║
+# ╚════════════════════════════════════════════════════════════╝
+#
         manifest["files"] = []
 
     print(f"\n🔍 Injecting highlights for feature: '{feature}'")
@@ -333,6 +375,7 @@ def main():
                 role, file_arg = parts
                 layer = "General"
 
+# └─ END FEATURE-TRACE: Manifest Tracking ────────────────────
         filepath, start_line, end_line = parse_file_arg(file_arg)
 
         if not os.path.exists(filepath):
@@ -347,13 +390,6 @@ def main():
             role        = role,
             part_index  = idx,
             part_total  = total,
-#
-# ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
-# ║  Role: Workflow                                              ║
-# ║  Layer: Core  │  Part 3 of 4                                 ║
-# ╚════════════════════════════════════════════════════════════╝
-#
             layer       = layer,
             dry_run     = args.dry_run,
         )
@@ -365,7 +401,6 @@ def main():
             manifest["files"].append({
                 "path":           filepath,
                 "injected_lines": injected_lines,
-# └─ END FEATURE-TRACE: Manifest Tracking ────────────────────
             })
 
     if not args.dry_run:

@@ -152,8 +152,8 @@ def main():
 #
 # ╔════════════════════════════════════════════════════════════╗
 # ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
-# ║  Role: Workflow                                              ║
-# ║  Layer: Core  │  Part 4 of 4                                 ║
+# ║  Role: 🛠️ Workflow                                           ║
+# ║  Layer: 🧠 Core  │  Part 4 of 4                               ║
 # ╚════════════════════════════════════════════════════════════╝
 #
 
