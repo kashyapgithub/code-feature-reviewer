@@ -1,0 +1,25 @@
+{
+  "name": "@kashyapgithub/pluto",
+  "version": "1.0.0",
+  "description": "PLUTO — Product-Level Universal Trace & Orchestrator. Instantly add feature-archaeology to any project.",
+  "main": "bin/install.js",
+  "bin": {
+    "pluto-setup": "bin/install.js"
+  },
+  "files": [
+    "SKILL.md",
+    "scripts/",
+    "references/",
+    "assets/",
+    "bin/"
+  ],
+  "keywords": [
+    "pluto",
+    "feature-tracer",
+    "code-archaeology",
+    "ai-skill"
+  ],
+  "author": "Kashyap",
+  "license": "MIT"
+}
+

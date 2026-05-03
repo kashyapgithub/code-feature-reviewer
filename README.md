@@ -234,6 +234,13 @@ python scripts/cleanup_highlights.py --dry-run
 
 ## 📥 Installation
 
+### The Quickest Way (npx)
+In any project directory, run:
+```bash
+npx @kashyapgithub/pluto setup
+```
+This will instantly drop the **PLUTO** skill, scripts, and search references into your project.
+
 ### Claude Code
 ```bash
 # Drop the skill folder into your Claude skills directory
@@ -250,14 +257,20 @@ Upload `SKILL.md` as a file at the start of your conversation. Trace reports wor
 
 To use **PLUTO** in a different codebase, simply ensure your AI assistant has access to the `SKILL.md` file and the `scripts/` directory.
 
-### Method 1: Drop-in (Recommended)
+### Method 1: The npx Shot (Recommended)
+Run this in your new project's root:
+```bash
+npx @kashyapgithub/pluto setup
+```
+
+### Method 2: Manual Drop-in
 Copy the `feature-tracer/` folder into your new project. Tell your AI: *"Read SKILL.md and use it to trace features."*
 
-### Method 2: Global Rules (Cursor / VS Code)
+### Method 3: Global Rules (Cursor / VS Code)
 1. Copy the contents of `SKILL.md` into your project's `.cursorrules` or `.clauderules` file.
 2. Keep the `scripts/` folder in your project root so the AI can execute them.
 
-### Method 3: Claude Code CLI
+### Method 4: Claude Code CLI
 Copy the folder to your global skills directory:
 ```bash
 cp -r feature-tracer ~/.claude/skills/
