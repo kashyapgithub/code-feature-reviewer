@@ -190,6 +190,7 @@ python scripts/cleanup_highlights.py --dry-run
 
 - **Zero code modification** — only comment lines are ever added or removed
 - **Manifest tracking** — every injected line is recorded so cleanup is precise
+- **Idempotent injection** — running highlights twice is safe; old markers are automatically replaced
 - **Idempotent cleanup** — running cleanup twice is safe, no double-removal
 - **Force mode** — even without a manifest, cleanup can scan and strip all markers
 - **Encoding safe** — reads/writes files as UTF-8 with graceful error handling
