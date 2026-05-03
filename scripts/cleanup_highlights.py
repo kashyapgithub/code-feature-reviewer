@@ -36,6 +36,7 @@ HIGHLIGHT_PATTERNS = [
     re.compile(r"^\s*(//|#)\s*║\s+"),                  # content rows:  // ║  text  ║
     re.compile(r"^\s*(//|#)\s*╚[═]+╝\s*$"),           # bottom border: // ╚════╝
     re.compile(r"^\s*(//|#)\s*└─\s*END FEATURE-TRACE"),# footer:        // └─ END FEATURE-TRACE...
+    re.compile(r"^\s*(//|#)\s*$"),                     # spacer line:   // 
 ]
 
 # Source file extensions to scan in --force mode
@@ -148,6 +149,13 @@ def main():
 
     args       = parser.parse_args()
     manifest   = load_manifest(args.manifest)
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
+# ║  Role: Workflow                                              ║
+# ║  Layer: Core  │  Part 4 of 4                                 ║
+# ╚════════════════════════════════════════════════════════════╝
+#
 
     # ── Mode 1: Use manifest (fast, targeted) ────────────────
     if manifest and not args.force:
@@ -180,6 +188,7 @@ def main():
             print(f"   Lines removed:    {total_removed}")
         else:
             print(f"\n[DRY RUN] Would remove ~{total_removed} line(s) from {cleaned_count} file(s)")
+# └─ END FEATURE-TRACE: Manifest Tracking ────────────────────
 
     # ── Mode 2: No manifest — scan everything (--force) ──────
     elif args.force or manifest is None:

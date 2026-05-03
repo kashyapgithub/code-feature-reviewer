@@ -1,0 +1,32 @@
+{
+  "feature": "Manifest Tracking",
+  "timestamp": "2026-05-03T11:35:00.705421+00:00",
+  "files": [
+    {
+      "path": "scripts/inject_highlights.py",
+      "injected_lines": [
+        350,
+        351,
+        352,
+        353,
+        354,
+        355,
+        356,
+        368
+      ]
+    },
+    {
+      "path": "scripts/cleanup_highlights.py",
+      "injected_lines": [
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        191
+      ]
+    }
+  ]
+}

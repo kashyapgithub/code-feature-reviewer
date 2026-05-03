@@ -85,6 +85,7 @@ HIGHLIGHT_PATTERNS = [
     re.compile(r"^\s*(//|#)\s*║\s+"),                  # content rows
     re.compile(r"^\s*(//|#)\s*╚[═]+╝\s*$"),           # bottom border
     re.compile(r"^\s*(//|#)\s*└─\s*END FEATURE-TRACE"),# footer
+    re.compile(r"^\s*(//|#)\s*$"),                     # spacer line (just the prefix)
 ]
 
 
@@ -133,12 +134,14 @@ def build_highlight_header(
         return f"{prefix} ║  {padded}  ║"
 
     bottom = f"{prefix} ╚{'═' * (BOX_WIDTH - 2)}╝"
+    spacer = f"{prefix}"
 
-    lines = [top, box_line(title_text)]
+    lines = [spacer, top, box_line(title_text)]
     if role_text:
         lines.append(box_line(role_text))
     lines.append(box_line(layer_text))
     lines.append(bottom)
+    lines.append(spacer)
 
     return lines
 
@@ -344,6 +347,13 @@ def main():
             role        = role,
             part_index  = idx,
             part_total  = total,
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Manifest Tracking                          ║
+# ║  Role: Workflow                                              ║
+# ║  Layer: Core  │  Part 3 of 4                                 ║
+# ╚════════════════════════════════════════════════════════════╝
+#
             layer       = layer,
             dry_run     = args.dry_run,
         )
@@ -355,6 +365,7 @@ def main():
             manifest["files"].append({
                 "path":           filepath,
                 "injected_lines": injected_lines,
+# └─ END FEATURE-TRACE: Manifest Tracking ────────────────────
             })
 
     if not args.dry_run:
