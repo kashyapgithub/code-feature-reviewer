@@ -1,0 +1,100 @@
+{
+  // ─────────────────────────────────────────────────────────────
+  // Feature Tracer — VS Code Color Settings
+  //
+  // Drop this into your project's .vscode/settings.json
+  // (or merge into your existing one).
+  //
+  // Requires one of these free extensions (install either):
+  //   • Better Comments  → marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments
+  //   • Todo Tree        → marketplace.visualstudio.com/items?itemName=Gruntfunn.todo-tree
+  //
+  // What you get:
+  //   ⚡ FEATURE-TRACE lines → bright amber background, bold white text
+  //   ╔══╗ border lines     → same amber, so the whole box glows
+  //   └─ END lines          → dimmer orange so you see the boundary
+  // ─────────────────────────────────────────────────────────────
+
+  // ── Better Comments configuration ────────────────────────────
+  // Colors any comment line that starts with these patterns.
+  "better-comments.tags": [
+    {
+      // Main FEATURE-TRACE label lines  →  ⚡ FEATURE-TRACE: ...
+      "tag": "⚡",
+      "color": "#1a1a1a",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#FFB300",
+      "bold": true,
+      "italic": false
+    },
+    {
+      // Box border lines  →  ╔═══╗  and  ╚═══╝
+      "tag": "╔",
+      "color": "#FFB300",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#3D2E00",
+      "bold": false,
+      "italic": false
+    },
+    {
+      // Box border lines  →  ╚═══╝
+      "tag": "╚",
+      "color": "#FFB300",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#3D2E00",
+      "bold": false,
+      "italic": false
+    },
+    {
+      // Box content rows  →  ║  Role: ...  ║
+      "tag": "║",
+      "color": "#FFD54F",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#2A1F00",
+      "bold": false,
+      "italic": false
+    },
+    {
+      // End marker  →  └─ END FEATURE-TRACE ...
+      "tag": "└",
+      "color": "#FF8F00",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "#1C1400",
+      "bold": false,
+      "italic": false
+    }
+  ],
+
+  // ── Todo Tree configuration ───────────────────────────────────
+  // Alternative to Better Comments — highlights the pattern anywhere
+  // in the file tree view AND inline in the editor.
+  "todo-tree.general.tags": [
+    "FEATURE-TRACE"
+  ],
+  "todo-tree.highlights.customHighlight": {
+    "FEATURE-TRACE": {
+      "icon": "zap",
+      "type": "line",
+      "foreground": "#1a1a1a",
+      "background": "#FFB300",
+      "iconColour": "#FFB300",
+      "fontWeight": "bold",
+      "borderRadius": "3px",
+      "gutterIcon": true
+    }
+  },
+  "todo-tree.highlights.defaultHighlight": {
+    "type": "line"
+  },
+
+  // ── Editor ruler to mark feature-trace lines ──────────────────
+  // Adds a subtle amber vertical rule in the gutter at col 0
+  "editor.rulers": [
+    { "column": 0, "color": "#FFB30022" }
+  ]
+}
