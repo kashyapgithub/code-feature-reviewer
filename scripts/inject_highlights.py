@@ -79,6 +79,19 @@ DEFAULT_COMMENT = ("#", "#", "#", "#")
 # Width of the highlight box
 BOX_WIDTH = 62
 
+# Patterns that identify injected highlight comment lines
+HIGHLIGHT_PATTERNS = [
+    re.compile(r"^\s*(//|#)\s*╔[═]+╗\s*$"),          # top border
+    re.compile(r"^\s*(//|#)\s*║\s+"),                  # content rows
+    re.compile(r"^\s*(//|#)\s*╚[═]+╝\s*$"),           # bottom border
+    re.compile(r"^\s*(//|#)\s*└─\s*END FEATURE-TRACE"),# footer
+]
+
+
+def is_highlight_line(line: str) -> bool:
+    """Return True if this line is an injected highlight comment."""
+    return any(pattern.match(line) for pattern in HIGHLIGHT_PATTERNS)
+
 
 def get_comment_style(filepath: str) -> tuple:
     """Return the comment prefix tuple for the given file extension."""
@@ -162,7 +175,17 @@ def inject_into_file(
 
     # Read original file
     with open(filepath, "r", encoding="utf-8") as f:
-        original_lines = f.readlines()
+        raw_lines = f.readlines()
+
+    # IDEMPOTENCY: Strip any existing feature-trace highlights first.
+    # This prevents double-injection if the command is run multiple times.
+    original_lines = [l for l in raw_lines if not is_highlight_line(l)]
+    
+    if len(original_lines) < len(raw_lines):
+        # If we stripped lines, the user's start/end line numbers might be off
+        # if they were calculated based on a file that ALREADY had highlights.
+        # We assume the AI provides line numbers for the CLEAN version of the file.
+        pass
 
     total_original = len(original_lines)
 
@@ -326,6 +349,9 @@ def main():
         )
 
         if injected_lines and not args.dry_run:
+            # Deduplicate: remove any previous entry for this same file path
+            manifest["files"] = [f for f in manifest["files"] if f["path"] != filepath]
+            
             manifest["files"].append({
                 "path":           filepath,
                 "injected_lines": injected_lines,
