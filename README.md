@@ -33,7 +33,6 @@ In some terminal environments (like **Claude Code**), long reports or trace resu
 |------|-------------|
 | **Trace** | You describe a feature in plain English. Claude searches your codebase across 6 signal types and returns a ranked, layered file report. |
 | **Highlight** | Claude injects bright box-art comments above every relevant code block in the actual source files. |
-| **Navigate** | Open any file — the `╔══ ⚡ FEATURE-TRACE ══╗` marker jumps out visually. No special plugin needed. |
 | **Cleanup** | Say "remove highlights" — every injected comment is stripped cleanly. Your code is untouched. |
 
 ---
@@ -113,7 +112,6 @@ The inject script automatically writes `.vscode/settings.json` into your project
 
 | Comment Part | Color |
 |---|---|
-| `⚡ FEATURE-TRACE:` label | **Amber background `#FFB300` — bold black text** |
 | `╔══╗` / `╚══╝` borders | Dark amber background `#3D2E00`, amber text |
 | `║` content rows | Dim amber background `#2A1F00`, gold text |
 | `└─ END` footer | Very dark background, orange text |
