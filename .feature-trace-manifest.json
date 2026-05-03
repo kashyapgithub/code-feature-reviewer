@@ -1,33 +1,7 @@
 {
-  "feature": "Project Core",
-  "timestamp": "2026-05-03T11:41:01.370654+00:00",
+  "feature": "Argument Parsing",
+  "timestamp": "2026-05-03T12:04:39.833668+00:00",
   "files": [
-    {
-      "path": "scripts/inject_highlights.py",
-      "injected_lines": [
-        240,
-        241,
-        242,
-        243,
-        244,
-        245,
-        246,
-        268
-      ]
-    },
-    {
-      "path": "scripts/cleanup_highlights.py",
-      "injected_lines": [
-        92,
-        93,
-        94,
-        95,
-        96,
-        97,
-        98,
-        115
-      ]
-    },
     {
       "path": "SKILL.md",
       "injected_lines": [
@@ -52,6 +26,32 @@
         6,
         7,
         108
+      ]
+    },
+    {
+      "path": "scripts/inject_highlights.py",
+      "injected_lines": [
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        277
+      ]
+    },
+    {
+      "path": "scripts/cleanup_highlights.py",
+      "injected_lines": [
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        107
       ]
     }
   ]

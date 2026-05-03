@@ -89,14 +89,14 @@ def clean_file(filepath: str, dry_run: bool = False) -> int:
     print(f"🧹 Cleaned {removed_count} line(s) from: {filepath}:1")
     return removed_count
 
+
 #
 # ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Project Core                               ║
+# ║  ⚡ FEATURE-TRACE: Argument Parsing                           ║
 # ║  Role: 💾 Persistence                                         ║
-# ║  Layer: 📜 Scripts  │  Part 2 of 4                            ║
+# ║  Layer: 🔹 Manifest  │  Part 3 of 3                           ║
 # ╚════════════════════════════════════════════════════════════╝
 #
-
 def load_manifest(manifest_path: str) -> dict | None:
     """Load manifest JSON. Returns None if the file does not exist."""
     if not os.path.exists(manifest_path):
@@ -104,6 +104,7 @@ def load_manifest(manifest_path: str) -> dict | None:
     with open(manifest_path, "r") as f:
         return json.load(f)
 
+# └─ END FEATURE-TRACE: Argument Parsing ─────────────────────
 
 def delete_manifest(manifest_path: str, dry_run: bool = False) -> None:
     """Remove the manifest file after cleanup."""
@@ -112,7 +113,6 @@ def delete_manifest(manifest_path: str, dry_run: bool = False) -> None:
         return
     os.remove(manifest_path)
     print(f"🗑️  Deleted manifest: {manifest_path}:1")
-# └─ END FEATURE-TRACE: Project Core ─────────────────────────
 
 
 def collect_source_files(root: str = ".") -> list[str]:

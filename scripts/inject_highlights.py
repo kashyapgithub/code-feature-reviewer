@@ -237,13 +237,6 @@ def inject_into_file(
     start_idx = max(0, min(start_line - 1, total_original))  # 0-based index
     end_idx   = max(start_idx, min(end_line - 1, total_original - 1))
 
-#
-# ╔════════════════════════════════════════════════════════════╗
-# ║  ⚡ FEATURE-TRACE: Project Core                               ║
-# ║  Role: 💾 Persistence                                         ║
-# ║  Layer: 📜 Scripts  │  Part 1 of 4                            ║
-# ╚════════════════════════════════════════════════════════════╝
-#
     # Build header and footer comment lines
     header_lines = build_highlight_header(
         feature, role, part_index, part_total, layer, prefix
@@ -256,6 +249,13 @@ def inject_into_file(
 
     # Splice into original content
     new_lines = (
+#
+# ╔════════════════════════════════════════════════════════════╗
+# ║  ⚡ FEATURE-TRACE: Argument Parsing                           ║
+# ║  Role: 🧠 Logic                                               ║
+# ║  Layer: 🔹 Parsing  │  Part 2 of 3                            ║
+# ╚════════════════════════════════════════════════════════════╝
+#
         original_lines[:start_idx]    # lines before the block
         + header_content              # ← header injected here
         + original_lines[start_idx:end_idx + 1]  # the original block
@@ -265,7 +265,6 @@ def inject_into_file(
 
     if dry_run:
         print(f"\n[DRY RUN] Would inject into: {filepath}")
-# └─ END FEATURE-TRACE: Project Core ─────────────────────────
         print(f"  Header at line {start_line}, footer after line {end_line}")
         for line in header_lines:
             print(f"  {line}")
@@ -275,6 +274,7 @@ def inject_into_file(
     # Write modified file
     with open(filepath, "w", encoding="utf-8") as f:
         f.writelines(new_lines)
+# └─ END FEATURE-TRACE: Argument Parsing ─────────────────────
 
     # Calculate the actual injected line numbers in the new file
     injected_line_numbers = (

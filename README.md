@@ -1,9 +1,9 @@
-# 🔍 Feature Tracer — Claude Skill
+# 🔍 PLUTO — Product-Level Universal Trace & Orchestrator
 
-> *"Hey, show me all the code responsible for the checkout flow."*
-> → Claude finds every file, explains each one's role, and highlights the exact lines in your editor.
+> *"Pluto, show me all the code responsible for the checkout flow."*
+> → **PLUTO** finds every file, explains each one's role, and highlights the exact lines in your editor.
 
-A Claude skill that performs **Feature Archaeology** — trace any product feature or operation across your entire codebase, then inject bright visual markers so you can navigate the code instantly.
+**PLUTO** is a Claude skill that performs **Feature Archaeology** — trace any product feature or operation across your entire codebase, then inject bright visual markers so you can navigate the code instantly.
 
 ---
 
@@ -226,7 +226,7 @@ Upload `SKILL.md` as a file at the start of your conversation. Trace reports wor
 
 ## 🚀 Using in a New Project
 
-To use Feature Tracer in a different codebase, simply ensure your AI assistant has access to the `SKILL.md` file and the `scripts/` directory.
+To use **PLUTO** in a different codebase, simply ensure your AI assistant has access to the `SKILL.md` file and the `scripts/` directory.
 
 ### Method 1: Drop-in (Recommended)
 Copy the `feature-tracer/` folder into your new project. Tell your AI: *"Read SKILL.md and use it to trace features."*
