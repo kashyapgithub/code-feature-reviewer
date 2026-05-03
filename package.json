@@ -1,5 +1,5 @@
 {
-  "name": "@kashyapgithub/pluto",
+  "name": "pluto-tracer",
   "version": "1.0.0",
   "description": "PLUTO — Product-Level Universal Trace & Orchestrator. Instantly add feature-archaeology to any project.",
   "main": "bin/install.js",

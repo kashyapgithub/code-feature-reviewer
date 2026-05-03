@@ -237,7 +237,7 @@ python scripts/cleanup_highlights.py --dry-run
 ### The Quickest Way (npx)
 In any project directory, run:
 ```bash
-npx @kashyapgithub/pluto setup
+npx pluto-tracer setup
 ```
 This will instantly drop the **PLUTO** skill, scripts, and search references into your project.
 
@@ -260,7 +260,7 @@ To use **PLUTO** in a different codebase, simply ensure your AI assistant has ac
 ### Method 1: The npx Shot (Recommended)
 Run this in your new project's root:
 ```bash
-npx @kashyapgithub/pluto setup
+npx pluto-tracer setup
 ```
 
 ### Method 2: Manual Drop-in
