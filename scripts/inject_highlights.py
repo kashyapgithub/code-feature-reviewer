@@ -80,33 +80,39 @@ DEFAULT_COMMENT = ("#", "#", "#", "#")
 BOX_WIDTH = 62
 
 ROLE_EMOJIS = {
-    "workflow": "🛠️",
-    "scripts":  "📜",
-    "ui":       "🎨",
-    "api":      "🔌",
-    "backend":  "⚙️",
-    "frontend": "💻",
-    "database": "🗄️",
-    "config":   "⚙️",
-    "test":     "🧪",
-    "docs":     "📄",
-    "persistence": "💾",
+    "workflow":      "🛠️",
+    "scripts":       "📜",
+    "ui":            "🎨",
+    "api":           "🔌",
+    "backend":       "⚙️",
+    "frontend":      "💻",
+    "database":      "🗄️",
+    "config":        "⚙️",
+    "test":          "🧪",
+    "docs":          "📄",
+    "persistence":   "💾",
+    "orchestration": "🎼",
+    "logic":         "🧠",
+    "routing":       "🚦",
 }
 
 LAYER_EMOJIS = {
-    "core":      "🧠",
-    "shell":     "🐚",
-    "service":   "🏗️",
-    "page":      "📄",
-    "component": "🧩",
-    "style":     "💅",
-    "scripts":   "📜",
+    "core":          "🧠",
+    "shell":         "🐚",
+    "service":       "🏗️",
+    "page":          "📄",
+    "component":     "🧩",
+    "style":         "💅",
+    "scripts":       "📜",
+    "ai skill":      "🤖",
+    "references":    "📚",
+    "general":       "📦",
 }
 
 
-def get_emoji(text: str, mapping: dict) -> str:
-    """Return an emoji for the given text if a mapping exists."""
-    return mapping.get(text.lower().strip(), "")
+def get_emoji(text: str, mapping: dict, default: str = "🔹") -> str:
+    """Return an emoji for the given text if a mapping exists, else default."""
+    return mapping.get(text.lower().strip(), default)
 
 
 # Patterns that identify injected highlight comment lines
